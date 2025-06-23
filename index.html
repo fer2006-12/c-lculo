@@ -2,101 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ecuación Lineal: Dominio y Rango</title>
+  <title>Calculadora de Ecuación Lineal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #eef5ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 20px;
-      background-color: #f0f8ff;
+    }
+    .calculadora {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
     }
     input, button {
       padding: 10px;
-      margin: 5px;
+      margin: 10px;
+      font-size: 16px;
+      width: 80%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
     }
     #resultado {
-      margin-top: 15px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    canvas {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Calculadora de Ecuación Lineal (y = mx + b)</h2>
-
-  <label for="m">Pendiente (m): </label>
-  <input type="number" id="m" value="1"><br>
-
-  <label for="b">Intersección (b): </label>
-  <input type="number" id="b" value="0"><br>
-
-  <button onclick="graficar()">Graficar</button>
-
-  <div id="resultado"></div>
+  <div class="calculadora">
+    <h2>Calculadora de Ecuaciones Lineales</h2>
+    <p>Escribe tu ecuación (por ejemplo: <code>y = 2x + 3</code>)</p>
+    <input type="text" id="ecuacion" placeholder="y = mx + b" value="y = 2x + 3">
+    <button onclick="calcular()">Graficar</button>
+    <div id="resultado"></div>
+  </div>
 
   <canvas id="grafico" width="600" height="400"></canvas>
 
   <script>
-    function graficar() {
-      const m = parseFloat(document.getElementById('m').value);
-      const b = parseFloat(document.getElementById('b').value);
+    function calcular() {
+      const entrada = document.getElementById("ecuacion").value.replace(/\s+/g, "");
+      const match = entrada.match(/^y=([\-]?\d*\.?\d*)x([\+\-]?\d+)?$/);
 
-      let xValues = [];
-      let yValues = [];
+      if (!match) {
+        alert("Formato incorrecto. Usa: y = mx + b");
+        return;
+      }
+
+      let m = parseFloat(match[1]);
+      if (isNaN(m)) m = 1; // Si no hay número, se asume 1
+      let b = parseFloat(match[2]) || 0;
+
+      const xValues = [];
+      const yValues = [];
 
       for (let x = -20; x <= 20; x++) {
         xValues.push(x);
         yValues.push(m * x + b);
       }
 
-      const rangoMin = Math.min(...yValues);
-      const rangoMax = Math.max(...yValues);
+      const rangoMin = Math.min(...yValues).toFixed(2);
+      const rangoMax = Math.max(...yValues).toFixed(2);
 
-      document.getElementById('resultado').innerHTML = `
-        <strong>Dominio:</strong> (-20, 20)<br>
-        <strong>Rango:</strong> (${rangoMin.toFixed(2)}, ${rangoMax.toFixed(2)})
+      document.getElementById("resultado").innerHTML = `
+        Dominio: (-20, 20)<br>
+        Rango: (${rangoMin}, ${rangoMax})
       `;
 
-      const ctx = document.getElementById('grafico').getContext('2d');
+      const ctx = document.getElementById("grafico").getContext("2d");
 
-      if (window.myChart) {
-        window.myChart.destroy(); // Borra el gráfico anterior si existe
-      }
+      if (window.miGrafico) window.miGrafico.destroy();
 
-      window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: xValues,
-          datasets: [{
-            label: `y = ${m}x + ${b}`,
-            data: yValues,
-            borderColor: 'blue',
-            backgroundColor: 'lightblue',
-            fill: false,
-            tension: 0
-          }]
-        },
-        options: {
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'x'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'y'
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Dibuja al cargar por defecto
-    graficar();
-  </script>
-
-</body>
-</html>
+      window.miGrafico = new Chart(ctx,
