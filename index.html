@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ecuación Lineal: Dominio y Rango</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f8ff;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+    }
+    #resultado {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Calculadora de Ecuación Lineal (y = mx + b)</h2>
+
+  <label for="m">Pendiente (m): </label>
+  <input type="number" id="m" value="1"><br>
+
+  <label for="b">Intersección (b): </label>
+  <input type="number" id="b" value="0"><br>
+
+  <button onclick="graficar()">Graficar</button>
+
+  <div id="resultado"></div>
+
+  <canvas id="grafico" width="600" height="400"></canvas>
+
+  <script>
+    function graficar() {
+      const m = parseFloat(document.getElementById('m').value);
+      const b = parseFloat(document.getElementById('b').value);
+
+      let xValues = [];
+      let yValues = [];
+
+      for (let x = -20; x <= 20; x++) {
+        xValues.push(x);
+        yValues.push(m * x + b);
+      }
+
+      const rangoMin = Math.min(...yValues);
+      const rangoMax = Math.max(...yValues);
+
+      document.getElementById('resultado').innerHTML = `
+        <strong>Dominio:</strong> (-20, 20)<br>
+        <strong>Rango:</strong> (${rangoMin.toFixed(2)}, ${rangoMax.toFixed(2)})
+      `;
+
+      const ctx = document.getElementById('grafico').getContext('2d');
+
+      if (window.myChart) {
+        window.myChart.destroy(); // Borra el gráfico anterior si existe
+      }
+
+      window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: xValues,
+          datasets: [{
+            label: `y = ${m}x + ${b}`,
+            data: yValues,
+            borderColor: 'blue',
+            backgroundColor: 'lightblue',
+            fill: false,
+            tension: 0
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'x'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'y'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Dibuja al cargar por defecto
+    graficar();
+  </script>
+
+</body>
+</html>
